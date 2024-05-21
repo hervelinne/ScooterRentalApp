@@ -1,0 +1,30 @@
+const express = require('express');
+const router = express.Router();
+const scooterController = require('../../controllers/scooterController');
+
+// Add scooter
+router.post('/add_scooter', scooterController.addScooter);
+
+// Get scooter by ID
+router.get('/get_scooter/:scooterId', scooterController.getScooter);
+
+// Update scooter by ID
+router.put('/update_scooter/:scooterId', scooterController.updateScooter);
+
+// Update scooter image by ID
+router.put('/update_scooter_image/:scooterId', scooterController.updateScooterImage);
+
+// Get all scooters
+router.get('/get_scooters', scooterController.getScooters);
+
+// Delete scoooter by ID 
+router.delete('/delete_scooter/:scooterId', scooterController.deletScooter);
+
+// Get Scooters with pagination 
+router.get('/get_scooters_pagination', scooterController.getScootersWithPagination);
+
+// Route for fetching scooters with pagination and filtering by user location
+router.get('/get_scooters_nearby', scooterController.getScootersWithPaginationNearby);
+
+
+module.exports = router;
