@@ -1,11 +1,17 @@
 <template>
 <div>
-    <h2 style="text-align: center; font-size: 3em; font-weight: bold; margin-bottom: 1em; margin-top:20px; ">Scooters</h2>
+    <h2 style="text-align: center; font-size: 3em; font-weight: bold; margin-bottom: 0.5em; margin-top:20px; ">Scooters</h2>
     <router-link :to="{name: 'addscooters'}" style="display: block; text-align: center;"><button class="btn">Add New Scooters</button></router-link>
     <div class="container">
+    <button @click="toggleSidebar" class="toggle-sidebar-button">
+          <span v-if="sidebarVisible">✖</span>
+          <span v-else>☰</span>
+        </button>
       <div class="row">
 
      <!-- Map and Draggable Filters Sidebar -->
+     <!-- Round Button to Toggle Sidebar -->
+     
         <div id="sidebar" class="draggable-sidebar" v-show="sidebarVisible">
           <div class="draggable-handle">Filters</div>
           <div class="map-container">
@@ -14,8 +20,8 @@
             <div class="filter-container">
               <!-- Color Filter -->
               <div class="filter-option">
-                <label for="color">Color:</label>
-                <select v-model="selectedColor" @change="applyFilters">
+                <label for="color"><b>Color:</b></label>
+                <select class="form-select" v-model="selectedColor" @change="applyFilters">
                   <option value="">All</option>
                   <option v-for="color in colors" :key="color">{{ color }}</option>
                 </select>
@@ -23,8 +29,8 @@
 
               <!-- City Filter -->
               <div class="filter-option">
-                <label for="city">City:</label>
-                <select v-model="selectedCity" @change="applyFilters">
+                <label for="city"><b>City:</b></label>
+                <select class="form-select" v-model="selectedCity" @change="applyFilters">
                   <option value="">All</option>
                   <option v-for="city in cities" :key="city">{{ city }}</option>
                 </select>
@@ -32,8 +38,8 @@
 
               <!-- Brand Filter -->
               <div class="filter-option">
-                <label for="brand">Brand:</label>
-                <select v-model="selectedBrand" @change="applyFilters">
+                <label for="brand"><b>Brand:</b></label>
+                <select class="form-select" v-model="selectedBrand" @change="applyFilters">
                   <option value="">All</option>
                   <option v-for="brand in brands" :key="brand">{{ brand }}</option>
                 </select>
@@ -41,29 +47,31 @@
 
               <!-- Price Filter -->
               <div class="filter-option">
-                 <label for="price">Price:</label>
+                 <label for="price"><b>Price:</b></label>
+                 <br/>
                 <label for="minPrice">Min Price:</label>
-                <input type="number" v-model="minPrice" @change="applyFilters" :min="priceRange.max" :max="maxPrice">
+                <input class="form-control" type="number" v-model="minPrice" @change="applyFilters" :min="priceRange.max" :max="maxPrice">
                 <label for="maxPrice">Max Price:</label>
-                <input type="number" v-model="maxPrice" @change="applyFilters" :min="minPrice" :max="priceRange.max">
+                <input class="form-control" type="number" v-model="maxPrice" @change="applyFilters" :min="minPrice" :max="priceRange.max">
               
               </div>
-
+              <hr/> 
               <!-- Near Me Filter -->
-              <div class="filter-option">
-                <button @click="fetchNearbyScooters">Near Me</button>
+              <div class="filter-option-nearme">
+                <button class="btn btn-secondary form-control"  @click="fetchNearbyScooters">Near Me</button>
               </div>
+
+              
             </div>
             <!-- Reset button -->
-            <button @click="resetFilters">Reset</button>
+            <div class="filter-option-reset">
+            <button class="btn btn-dark"  @click="resetFilters">Reset <i class="bi bi-arrow-counterclockwise"/></button>
+            </div>
           </div>
+          
         </div>
 
-        <!-- Round Button to Toggle Sidebar -->
-        <button @click="toggleSidebar" class="toggle-sidebar-button">
-          <span v-if="sidebarVisible">✖</span>
-          <span v-else>☰</span>
-        </button>
+        
         <!-- Scooter Cards -->
         <div :class="[{'offset-4': sidebarVisible}, sidebarVisible ? 'col-8' :'col-12' ]">
           <div class="row">
@@ -310,7 +318,7 @@ export default {
   top: 100px;
   left: 0;
   width: 500px;
-  background-color: #fff;
+  background-color: white;
   border: 1px solid #ddd;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 10px;
@@ -334,12 +342,12 @@ export default {
 }
 
 .toggle-sidebar-button {
-  position: fixed;
-  top: 50px;
-  left: 10px;
+  position: relative; 
+  top: -80px;
+  left: -60px;
   z-index: 1001; /* Ensure the button is on top */
-  background-color: #007bff;
-  color: white;
+  background-color:#212529; 
+  color: #2ba7ba;
   border: none;
   width: 50px;
   height: 50px;
@@ -353,11 +361,17 @@ export default {
 }
 
 .toggle-sidebar-button:hover {
-  background-color: #0056b3;
+  background-color: white;
 }
 
 .slider-container {
   position: relative;
+}
+
+.filter-option-reset {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  margin-top: 10px; /* Adjust margin as needed */
 }
 
 </style>
