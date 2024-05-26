@@ -15,6 +15,15 @@ const PORT = 3500
 
 connectDB()
 
+mongoose.connection.once('open', () => {
+    mongoose.connection.db.collection('scooters').createIndex({ "location.coordinates": "2dsphere" }, (err) => {
+        if (err) {
+            console.error('Error creating index:', err);
+        } else {
+            console.log('2dsphere index created successfully.');
+        }
+    });
+});
 
 // Allow credentials 
 app.use(credentials)
@@ -39,6 +48,8 @@ app.use(errorHandlerMiddleware)
 
 // Routes 
 app.use('/api/auth', require('./routes/api/auth'))
+app.use('/api/scooter', require('./routes/api/scooter'))
+
 
 //default routes inside of our app 
 app.all('*', (req, res)=> {

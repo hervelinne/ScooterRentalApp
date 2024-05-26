@@ -1,5 +1,5 @@
 const mongoose = require('mongoose'); 
-
+const Scooter = require('../models/Scooter');
 
 // should use mater process.env.DATABASE_URI instead of actual path of db 
 async function connect(){
@@ -8,9 +8,11 @@ async function connect(){
             useUnifiedTopology: true, 
             useNewUrlParser: true
         }); 
-    }catch(error){
-        console.log(error)
+        
+    } catch (error) {
+        console.log(error);
     }
 }
+
 
 module.exports = connect 

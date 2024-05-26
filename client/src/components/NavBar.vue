@@ -10,9 +10,11 @@
       </button>
       <div class="collapse navbar-collapse" id="appNavbar">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          
         </ul>
         <ul class="navbar-nav mb-2 mb-lg-0 me-4">
+          <li v-if="isAuthenticated" class="nav-item ">
+              <router-link :to="{name: 'scooters'}" class="nav-link" aria-current="page">Scooters</router-link>
+          </li>
           <li v-if="isAuthenticated" class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               {{ user.username }}

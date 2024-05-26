@@ -16,10 +16,14 @@
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
+    "interactjs": "^1.10.27",
+    "jquery": "^3.7.1",
+    "leaflet": "^1.9.4",
+    "nouislider": "^15.7.2",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "vuetify": "^3.5.17"
+    "vuetify": "^3.6.7"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
@@ -31,7 +35,7 @@
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/tsconfig": "^0.5.1",
     "eslint": "^8.57.0",
-    "eslint-plugin-vue": "^9.23.0",
+    "eslint-plugin-vue": "^9.26.0",
     "npm-run-all2": "^6.1.2",
     "prettier": "^3.2.5",
     "typescript": "~5.4.0",
