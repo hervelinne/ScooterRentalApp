@@ -1,4 +1,5 @@
 const Scooter = require('../models/Scooter');
+const mongoose = require('mongoose'); 
 
 // Add a new scooter
 async function addScooter(req, res) {
@@ -102,16 +103,43 @@ async function getScootersWithPagination(req, res) {
 
     // Calculate the start and end indexes for the requested page
     const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+    //const endIndex = page * limit;
 
-    try {
-        // Retrieve paginated scooters from the database
-        const scooters = await Scooter.find().skip(startIndex).limit(limit).exec();
-        const count = await Scooter.countDocuments().exec(); // Count total number of scooters
+    // Define filter object
+    const filter = {};
+
+    // Apply color filter if provided
+    if (req.query.color) {
+        filter.color = req.query.color;
+    }
+
+    // Apply city filter if provided
+    if (req.query.city) {
+        filter.city = req.query.city;
+    }
+
+    // Apply brand filter if provided
+    if (req.query.brand) {
+        filter.brand = req.query.brand;
+    }
+
+    // Apply price filter if provided
+    if (req.query.minPrice && req.query.maxPrice) {
+        filter.price = { $gte: parseInt(req.query.minPrice), $lte: parseInt(req.query.maxPrice) };
+    } else if (req.query.minPrice) {
+        filter.price = { $gte: parseInt(req.query.minPrice) };
+    } else if (req.query.maxPrice) {
+        filter.price = { $lte: parseInt(req.query.maxPrice) };
+    }
+
+   try {
+        // Retrieve paginated scooters from the database based on filters
+        const scooters = await Scooter.find(filter).skip(startIndex).limit(limit).exec();
+        const count = await Scooter.countDocuments(filter).exec(); // Count total number of scooters
 
         // Calculate the total number of pages
         const totalPages = Math.ceil(count / limit);
-    
+
         // Send the paginated scooters and total pages as the API response
         res.json({ scooters, totalPages });
 
@@ -121,58 +149,62 @@ async function getScootersWithPagination(req, res) {
     }
 }
 
-
-// Controller function to fetch scooters with pagination & near the user 
-async function getScootersWithPaginationNearby(req, res) {
+// Get filter options for colors, cities, and brands
+async function getFilterOptions(req, res) {
     try {
-      // Parse page and limit parameters from the request query string
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10;
-      const skip = (page - 1) * limit;
-  
-      // Parse latitude and longitude parameters from the request query string
-      const latitude = parseFloat(req.query.latitude) || 0;
-      const longitude = parseFloat(req.query.longitude) || 0;
-  
-      // Define radius for nearby scooters (in kilometers)
-      const radius = 5; // Example radius
-  
-      // Calculate the maximum and minimum latitude and longitude based on the user's location and radius
-      const maxLat = latitude + (radius / 110.574); // 1 degree of latitude is approximately 110.574 kilometers
-      const minLat = latitude - (radius / 110.574);
-      const maxLng = longitude + (radius / (111.32 * Math.cos(latitude * (Math.PI / 180)))); // 1 degree of longitude varies depending on latitude
-      const minLng = longitude - (radius / (111.32 * Math.cos(latitude * (Math.PI / 180))));
-  
-      // Query the database for scooters within the specified radius
-      const scooters = await Scooter.find({
-        $and: [
-          { latitude: { $gte: minLat, $lte: maxLat } }, // Latitude within range
-          { longitude: { $gte: minLng, $lte: maxLng } } // Longitude within range
-        ]
-      })
-        .skip(skip)
-        .limit(limit);
-  
-      // Count total number of scooters
-      const count = await Scooter.countDocuments({
-        $and: [
-          { latitude: { $gte: minLat, $lte: maxLat } }, // Latitude within range
-          { longitude: { $gte: minLng, $lte: maxLng } } // Longitude within range
-        ]
-      });
-  
-      // Calculate total number of pages
-      const totalPages = Math.ceil(count / limit);
-  
-      // Send response with paginated scooters and total pages
-      res.status(200).json({ scooters, totalPages });
+        // Get unique colors from the database
+        const colors = await Scooter.distinct('color').exec();
+
+        // Get unique cities from the database
+        const cities = await Scooter.distinct('city').exec();
+
+        // Get unique brands from the database
+        const brands = await Scooter.distinct('brand').exec();
+
+        // Get min and max prices from the database
+        const minPrice = await Scooter.find().sort({ price: 1 }).limit(1).select('price').exec();
+        const maxPrice = await Scooter.find().sort({ price: -1 }).limit(1).select('price').exec();
+
+        res.status(200).json({ colors, cities, brands, minPrice: minPrice[0].price, maxPrice: maxPrice[0].price });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Internal server error" });
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
     }
-  }
+}
+
+async function getScootersNearMe(req, res) {
+    // Pagination parameters
+    longitude = req.query.longitude
+    latitude = req.query.latitude
+     page = parseInt(req.query.page) || 1;
+     limit = parseInt(req.query.limit) || 3; 
+
+     const startIndex = (page - 1) * limit;
+    try {
+
+        // Query scooters near the specified location
+        const scooters = await Scooter.find({
+            "location.coordinates": {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [parseFloat(longitude), parseFloat(latitude)]
+                    },
+                    $maxDistance: 20000 //20km distance
+                }
+            }
+        })
+        .skip(startIndex).limit(limit)
+        .exec();
+
+        res.json({ scooters });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
 
 
 
-module.exports = { addScooter, getScooter, updateScooter, updateScooterImage, getScooters
-                 ,deletScooter, getScootersWithPagination, getScootersWithPaginationNearby };
+module.exports = { addScooter, getScooter, updateScooter, updateScooterImage, getScooters, getScootersNearMe
+                 ,deletScooter, getScootersWithPagination, getFilterOptions };
