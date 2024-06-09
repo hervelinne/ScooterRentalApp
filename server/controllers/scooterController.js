@@ -83,7 +83,7 @@ async function getScooters(req, res) {
 }
 
 // Delete scooter by id 
-async function deletScooter(res, req){
+async function deletScooter(req, res){
     const scooterId = req.params.scooterId;
 
     try {
@@ -95,6 +95,7 @@ async function deletScooter(res, req){
         return res.status(500).json({ message: "Internal server error" }); // Send an error response
     }
 }
+
 
 // getScooters using pagination
 async function getScootersWithPagination(req, res) {

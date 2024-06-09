@@ -29,6 +29,23 @@ const router = createRouter({
       name: 'scooters',
       component: () => import('../views/scooter/ScootersView.vue')
     },
+    {
+      path: '/addscooters',
+      name: 'addscooters',
+      component: () => import('../views/scooter/addScootersView.vue')
+    },
+    {
+      path: '/scooter/:id',
+      name: 'scooterDetails',
+      component: () => import('../views/scooter/ScootersDetails.vue'),
+      props: true
+    },
+    {
+      path: '/updatescooters/:id',
+      name: 'updatescooters',
+      component: () => import('../views/scooter/updateScooters.vue'),
+      props: true
+    },
   ]
 })
 

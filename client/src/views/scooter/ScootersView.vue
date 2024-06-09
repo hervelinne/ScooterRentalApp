@@ -1,6 +1,8 @@
 <template>
-<div>
-    <h2 style="text-align: center; font-size: 3em; font-weight: bold; margin-bottom: 0.5em; margin-top:20px; ">Scooters</h2>
+  <div>
+    <h2 style="text-align: center; font-size: 3em; font-weight: bold; margin-bottom: 1em; margin-top:20px; ">Scooters</h2>
+    <router-link :to="{name: 'addscooters'}" style="display: block; text-align: center;"><button class="btn">Add New Scooters</button></router-link>
+
     <div class="container">
     <button @click="toggleSidebar" class="toggle-sidebar-button">
           <span v-if="sidebarVisible">✖</span>
@@ -83,7 +85,7 @@
                   <p class="card-text"><small class="text-muted">{{ scooter.city }}</small></p>
                   <p class="card-text"><small class="text-muted">{{ scooter.price }}€/hour</small></p>
                   <div class="card-body ">
-                    <a href="#" class="btn bg-dark text-white" style="margin-right: 1rem; margin-left: 1rem;">See details</a>
+                    <router-link :to="{ name: 'scooterDetails', params: { id: scooter._id } }" class="btn bg-dark text-white" style="margin-right: 1rem; margin-left: 1rem;">See details</router-link>
                     <button :disabled="!scooter.isAvailable" class="btn bg-dark text-white">Rent</button>
                   </div>
                 </div>
