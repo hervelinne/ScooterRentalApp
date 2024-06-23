@@ -54,14 +54,14 @@
   </template>
   
   <script setup lang="ts">
-  import { useScooterStore, type scooterData } from '../../stores/scooters';
+  import { useScooterStore, type Scooter } from '../../stores/scooters';
   import { reactive, ref } from 'vue';
   import { useRouter } from 'vue-router';
 
   const ScooterStore = useScooterStore()
   const router = useRouter()
   
-  const scooterData = reactive<scooterData>({
+  const scooterData = reactive<Scooter>({
     brand: "",
     color: "Black",
     address: "",

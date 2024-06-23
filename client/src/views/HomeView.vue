@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import homescooter from '../assets/homescooter.png'; // Correct import path
 </script>
 
