@@ -1,7 +1,8 @@
 <template>
-<div>
-    <h2 style="text-align: center; font-size: 3em; font-weight: bold; margin-bottom: 0.5em; margin-top:20px; ">Scooters</h2>
+  <div>
+    <h2 style="text-align: center; font-size: 3em; font-weight: bold; margin-bottom: 1em; margin-top:20px; ">Scooters</h2>
     <router-link :to="{name: 'addscooters'}" style="display: block; text-align: center;"><button class="btn">Add New Scooters</button></router-link>
+
     <div class="container">
     <button @click="toggleSidebar" class="toggle-sidebar-button">
           <span v-if="sidebarVisible">✖</span>
