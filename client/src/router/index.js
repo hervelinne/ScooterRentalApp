@@ -46,6 +46,11 @@ const router = createRouter({
       component: () => import('../views/scooter/updateScooters.vue'),
       props: true
     },
+    {
+      path: '/rentedscooters',
+      name: 'rentedscooters',
+      component: () => import('../views/scooter/rentedScooters.vue'),
+    },
   ]
 })
 

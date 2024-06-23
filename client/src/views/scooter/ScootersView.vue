@@ -2,13 +2,12 @@
   <div>
     <h2 style="text-align: center; font-size: 3em; font-weight: bold; margin-bottom: 1em; margin-top:20px; ">Scooters</h2>
     <router-link :to="{name: 'addscooters'}" style="display: block; text-align: center;"><button class="btn">Add New Scooters</button></router-link>
-
-    <div class="container">
-    <button @click="toggleSidebar" class="toggle-sidebar-button">
-          <span v-if="sidebarVisible">✖</span>
-          <span v-else>☰</span>
-        </button>
-      <div class="row">
+        <div class="container">
+          <button @click="toggleSidebar" class="toggle-sidebar-button">
+            <span v-if="sidebarVisible">✖</span>
+            <span v-else>☰</span>
+          </button>
+           <div class="row">
 
      <!-- Map and Draggable Filters Sidebar -->
      <!-- Round Button to Toggle Sidebar -->
@@ -71,8 +70,7 @@
           </div>
           
         </div>
-
-        
+           
         <!-- Scooter Cards -->
         <div :class="[{'offset-4': sidebarVisible}, sidebarVisible ? 'col-8' :'col-12' ]">
           <div class="row">
@@ -83,10 +81,10 @@
                   <h5 class="card-title">{{ scooter.brand }}</h5>
                   <h6 class="card-subtitle mb-2 text-muted">{{ scooter.isAvailable ? "Available" : "Not Available" }}</h6>
                   <p class="card-text"><small class="text-muted">{{ scooter.city }}</small></p>
-                  <p class="card-text"><small class="text-muted">{{ scooter.price }}€/hour</small></p>
+                  <p class="card-text"><small class="text-muted">{{ scooter.price }}€/Day</small></p>
                   <div class="card-body ">
                     <router-link :to="{ name: 'scooterDetails', params: { id: scooter._id } }" class="btn bg-dark text-white" style="margin-right: 1rem; margin-left: 1rem;">See details</router-link>
-                    <button :disabled="!scooter.isAvailable" class="btn bg-dark text-white">Rent</button>
+                    <button :disabled="!scooter.isAvailable" @click="openRentalModal(scooter)" class="btn bg-dark text-white">Rent</button> 
                   </div>
                 </div>
               </div>
@@ -95,6 +93,8 @@
         </div>
       </div>
     </div>
+    <!-- Rental Modal -->
+    <RentalModal :visible="isRentalModalVisible" :scooter="selectedScooter" @close="closeRentalModal" @confirm-rental="confirmRental" />
     <!-- Pagination Controls -->
     <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
@@ -118,16 +118,21 @@
 
 
 <script>
-import axios from 'axios';
+
 import { useApiPrivate } from "../../composables/useApi"
+import { useAuthStore } from '../../stores/auth.js';
 import { onMounted, ref } from "vue";
 import L from "leaflet";
 import interact from 'interactjs';
-import $ from 'jquery';
+import RentalModal from './popup/RentalPopup.vue'; // Importing the popup 
 
-export default {
+ export default {
+  components: {
+    RentalModal
+  },
   data() {
     return {
+      authStore: useAuthStore(),
       scooters: [],
       currentPage: 1,
       itemsPerPage: 6, 
@@ -139,14 +144,21 @@ export default {
       selectedBrand: '',
       minPrice: 0, // Initial min price
       maxPrice: 100, // Initial max price
-      priceRange: { min: 0, max: 100 } 
+      priceRange: { min: 0, max: 100 }, 
+      isRentalModalVisible: false, // Add this line
+      selectedScooter: null, // Add this line
+      startTime : '',
+      endTime : '', 
+      colors: [], 
+      cities: [], 
+      brands: []
     };
   },
   created() {
     this.fetchData();
     this.fetchFilterOptions();
   },
-  methods: {
+   methods: {
     async fetchData() {
       try {
         const response = await useApiPrivate().get(`/api/scooter/get_scooters_pagination?page=${this.currentPage}&limit=${this.itemsPerPage}`);
@@ -232,7 +244,7 @@ export default {
               }
             }); 
             this.scooters = response.data.scooters;
-            console.log(this.scooters.length()); 
+            console.log(this.scooters.length); 
         } catch (error) {
             console.error('Error fetching nearby scooters:', error);
         }
@@ -241,8 +253,41 @@ export default {
         return new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject);
         });
+    },
+    openRentalModal(scooter) {
+      this.selectedScooter = scooter;
+      this.startTime = ''; 
+      this.endTime =''; 
+      this.isRentalModalVisible = true;
+      console.log("Popup/modal Opened");
+    },
+    closeRentalModal() {
+      this.isRentalModalVisible = false;
+      this.selectedScooter = null;
+      console.log("Popup/modal closed");
+    },
+    async confirmRental(scooter) {
+      if (scooter) {
+        try {
+          const userId = this.authStore.user._id; 
+          console.log(JSON.stringify(userId));
+          let rentalDetails = {
+            userId, 
+            scooterId: this.selectedScooter._id ,
+            startTime: scooter.startTime ,
+            endTime: scooter.endTime
+          }
+          console.log(JSON.stringify(rentalDetails));
+          await useApiPrivate().post(`/api/rental/rent`, rentalDetails);
+          this.isRentalModalVisible = false;
+          alert('Scooter rented successfully!');
+        } catch (error) {
+          console.error('Error renting scooter:', error);
+          alert('Failed to rent scooter. Please try again.');
+        }
+      }
     }
-  },
+   },
   
   computed: {
     totalPages() {
@@ -256,8 +301,7 @@ export default {
     const mapContainer = ref(null);
 
     onMounted(() => {
-       initializeMap();
-
+      initializeMap();
       interact('#sidebar').draggable({
         allowFrom: '.draggable-handle',
         listeners: {
@@ -302,13 +346,13 @@ export default {
 
     return { lat, lng, mapContainer };
   }
-};
+ };
 </script>
 
 
 <style>
 
-.map-container {
+ .map-container {
   height: 100%;
   padding-left: 20px;
   background-color: #fff;
@@ -319,7 +363,7 @@ export default {
   top: 100px;
   left: 0;
   width: 500px;
-  background-color: white;
+  background-color: #fff;
   border: 1px solid #ddd;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 10px;
@@ -373,6 +417,6 @@ export default {
   display: flex;
   justify-content: center; /* Center horizontally */
   margin-top: 10px; /* Adjust margin as needed */
-}
+} 
 
-</style>
+</style> 

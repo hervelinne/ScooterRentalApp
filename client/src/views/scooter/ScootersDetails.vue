@@ -28,7 +28,6 @@
 
 <script>
 import { useApiPrivate } from "../../composables/useApi";
-import { useRouter } from 'vue-router';
 
 export default {
   props: {

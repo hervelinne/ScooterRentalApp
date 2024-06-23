@@ -42,21 +42,14 @@ export const useScooterStore = defineStore("scooter", {
 
   actions: {
     async addScooter(payload: scooterData) {
-      try {
         const { data } = await useApiPrivate().post(`/api/scooter/add_scooter`, payload);
         return data;
-      } catch (error) {
-        throw error;
-      }
     },
 
     async fetchAllScooters(): Promise<void> {
-      try {
         const { data } = await useApi().get("/api/scooter/get_scooters");
         this.scooters = data;
-      } catch (error) {
-        throw error;
-      }
+
     },
 
     async getScooterById(scooterId: string): Promise<Scooter> {
