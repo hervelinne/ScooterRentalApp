@@ -38,6 +38,10 @@ const ScooterSchema = new Schema({
         required: true,
         default: true
     },
+    rentals: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Rental'
+    }]
 
 })
 

@@ -34,6 +34,10 @@ const UserSchema = Schema(
             required: true,
             min: 3
           },
+          rentals: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Rental'
+        }],
       
           refresh_token: String
         },

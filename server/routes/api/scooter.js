@@ -23,10 +23,12 @@ router.delete('/delete_scooter/:scooterId', scooterController.deletScooter);
 // Get Scooters with pagination 
 router.get('/get_scooters_pagination', scooterController.getScootersWithPagination);
 
- // Route for fetching scooters with pagination and filtering by user location
+ // Fetching scooters with pagination and filtering by user location
 router.get('/nearby', scooterController.getScootersNearMe);
 
-// Route for fetching scooters with pagination and filtering by user location
+// Fetching scooters with pagination and filtering by user location
 router.get('/filter_options', scooterController.getFilterOptions);
 
+// Getting scooter's rental 
+router.get('/rentals/:scooterId', scooterController.getScootersRental);
 module.exports = router;

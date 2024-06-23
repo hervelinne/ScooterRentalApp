@@ -1,5 +1,4 @@
 const Scooter = require('../models/Scooter');
-const mongoose = require('mongoose'); 
 
 // Add a new scooter
 async function addScooter(req, res) {
@@ -205,7 +204,15 @@ async function getScootersNearMe(req, res) {
     }
 }
 
-
+//Get rentals of a scooter 
+async function getScootersRental(req, res){
+    try {
+        const scooter = await Scooter.findById(req.params.scooterId).populate('rentals');
+        res.json(scooter.rentals);
+      } catch (error) {
+        res.status(500).json({ message: 'Error fetching rental periods', error });
+      }
+}
 
 module.exports = { addScooter, getScooter, updateScooter, updateScooterImage, getScooters, getScootersNearMe
-                 ,deletScooter, getScootersWithPagination, getFilterOptions };
+                 ,deletScooter, getScootersWithPagination, getFilterOptions, getScootersRental };

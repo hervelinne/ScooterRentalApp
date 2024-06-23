@@ -48,8 +48,9 @@ app.use(errorHandlerMiddleware)
 
 // Routes 
 app.use('/api/auth', require('./routes/api/auth'))
-app.use('/api/scooter', require('./routes/api/scooter'))
-
+app.use('/api/scooter', require('./routes/api/scooter')) 
+app.use('/api/rental', require('./routes/api/rental'))
+app.use('/api/user', require('./routes/api/user'))
 
 //default routes inside of our app 
 app.all('*', (req, res)=> {
